@@ -105,10 +105,38 @@ System.out.println("20000条的误判率：" + count / 10000.0);
 ### Redis的布隆过滤器
 Redis可以通过自带bitMap实现布隆过滤器，但具体的逻辑需要自己编写。
 
-Redis官方也提供了布隆过滤器插件，可以下载编译安装到现有的Redis中。
+#### 直接安装插件
+Redis官方也提供了[布隆过滤器插件](https://github.com/RedisBloom/RedisBloom)，需要下载并手动编译，启动时加载到现有的Redis中。
 
-同时，在Docker中，官方有一个带有RedisBloom的插件版本的Redis，可以直接拉取镜像使用。
+```bash
+# 编译插件前，需要系统有gcc, make, python3, wget
+apt install gcc make python3 wget
 
+# 克隆代码(一定要加上, recursive, 循环克隆子项目，不然编译可能会出错)
+git clone --recursive https://github.com/RedisBloom/RedisBloom.git
+cd RedisBloom
+# 编译
+make setup
+make
+
+# 编译完后，重启Redis的命令带上编译好的so插件即可
+redis-server --loadmodule ./redisbloom.so
+```
+
+
+~~**注意** 布隆插件的2.2.15版本疑似有BUG，会编译报文件不存在的错误，2.2.14版本就没有问题。~~
+```bash
+/mnt/d/Docker/Redis/RedisBloom-2.2.15/src/rm_tdigest.c: In function ‘TDigestSketch_Create’:
+/mnt/d/Docker/Redis/RedisBloom-2.2.15/src/rm_tdigest.c:72:5: error: unknown type name ‘td_histogram_t’
+   72 |     td_histogram_t *tdigest = td_new(compression);
+      |     ^~~~~~~~~~~~~~
+```
+
+
+
+
+#### Docker中安装带布隆过滤器的Redis镜像
+在Docker中，官方有一个带有RedisBloom的插件版本的Redis，可以直接拉取镜像使用。
 ```bash
 # docker搜索redislabs可以搜索到很多有趣的插件，其中redislabs/rebloom就是我们需要的带布隆过滤器版本的redis
 docker search redislabs
@@ -135,8 +163,7 @@ docker exec -it redis-redisbloom bash
 redis-cli
 ```
 
-
-布隆过滤器有以下基本指令
+#### Redis布隆过滤器基本指令
 * 创建布隆过滤器
    ```bash
    # bf.reserve
@@ -201,7 +228,7 @@ redis-cli
 
 
 #### Redisson
-Redisson已经封装好了相关的操作逻辑，且使用原版的Redis即可，直接使用即可。
+Redisson已经封装好了相关的操作逻辑，且使用原版的Redis即可，不对Redis进行任何修改，直接使用即可。
 ```java
 Config config = new Config();
 config.useSingleServer().setAddress("redis://myServer:3306");
@@ -224,7 +251,8 @@ for (int i = 90000; i < 100000; i++) {
 
 
 ## 参考资料
-1. [维基百科](https://zh.wikipedia.org/wiki/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8)
-2. [布隆过滤器，这一篇给你讲的明明白白](https://developer.aliyun.com/article/773205)
-3. [Guava包中的BloomFilter](https://blog.csdn.net/zc19921215/article/details/91047708)
-4. [布隆过滤器](https://www.cnblogs.com/Howlet/p/12688707.html)
+1. [Redis布隆过滤器官方文档](https://redis.io/docs/stack/bloom/)
+2. [维基百科](https://zh.wikipedia.org/wiki/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8)
+3. [布隆过滤器，这一篇给你讲的明明白白](https://developer.aliyun.com/article/773205)
+4. [Guava包中的BloomFilter](https://blog.csdn.net/zc19921215/article/details/91047708)
+5. [布隆过滤器](https://www.cnblogs.com/Howlet/p/12688707.html)
