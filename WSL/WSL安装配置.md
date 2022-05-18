@@ -143,3 +143,30 @@ wsl --set-version Debian 2
 wsl --set-default-version 2
 ```
 
+## WLS2使用Windows代理
+1. 检查WSL2能不能PING通Windows主机
+   ```bash
+   cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*'
+   172.29.160.1
+   ```
+2. 在WSL2下Ping该地址
+   ```bash
+   ping 172.29.160.1
+   ```
+   如果Ping不通，在Windows下已管理员模式打开powershell，输入以下命令
+   ```bash
+   New-NetFirewallRule -DisplayName "WSL" -Direction Inbound  -InterfaceAlias "vEthernet (WSL)"  -Action Allow
+   ```
+   输入后，就可以ping通了
+3. 打开Windows的代理，勾选如(允许来自局域网的连接)或(ALLOW LAN)之类的选项，并确认代理的端口(如我的是7890)
+4. 在WSL2下输入以下指令
+   ```bash
+   export hostip=$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')
+   export https_proxy="http://${hostip}:7890"
+   export http_proxy="http://${hostip}:7890"
+   ```
+5. 如果不需要代理了，执行如下指令删除配置即可
+   ```bash
+   export -n https_proxy
+   export -n http_proxy
+   ```
