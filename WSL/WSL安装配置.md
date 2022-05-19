@@ -143,7 +143,98 @@ wsl --set-version Debian 2
 wsl --set-default-version 2
 ```
 
-## WLS2使用Windows代理
+## WSL2固定IP
+参考: https://www.cnblogs.com/RainFate/p/15796866.html
+
+
+WSL2的IP会经常自己发生改变，可以通过安装一个软件，wsl2host，每次将wsl2的ip写入host，用来固定域名。
+
+### 安装并启动WSL2
+
+[wsl2host](https://github.com/shayne/go-wsl2-host)
+
+下载后，切换到对应wsl2host的目录，执行如下命令
+```bash
+.\wsl2host.exe install
+# 输入用户名
+Windows Username: <username-you-use-to-login-to-windows>
+# 输入密码
+Windows Password: <password-for-this-user>
+```
+输入完后，可以去服务中，查看windows服务中的WSL2 HOST服务是否启动，若未启动可以手动启动。
+
+如果启动失败，可以执行如下操作
+1. 命令行输入 **secpol.msc**
+2. 在左侧窗口展开本地策略，选择用户权限分配
+3. 在右侧窗口双击作为服务登录
+4. 点击添加用户组，将当前电脑的用户名输入进去，微软会自动补全对应的用户名
+5. 重启windows服务中的WSL2 HOST服务
+
+启动成功后，前往host目录(C:\Windows\System32\drivers\etc\hosts)检查host文件，此时应该会多出一行wsl2的ip和对应的域名
+
+### 卸载WSL2
+以管理员模式打开powershell，输入一下命令
+```bash
+wsl2host.exe stop
+wsl2host.exe remove
+```
+
+### 自定义域名
+进入 WSL ，新建 ~/.wsl2hosts 文件，输入自定义的域名，多个则用逗号隔开，如下所示
+```
+debian.wsl  myServer.wsl wsl.loacl
+```
+退出 WSL ，重启 WSL2 Host 服务。
+
+
+## 配置SSH使其他电脑能远程登录WSL2
+1. 部分系统可能需要先安装ssh服务
+    ```bash
+    apt instal openssh-server
+    ```
+2. 打开配置文件，修改端口
+    ```bash
+    vim /etc/ssh/sshd_config
+    
+    # 找到以下几个配置
+    # ssh端口
+    Port 2211
+    AddressFamily any
+    ListenAddress 0.0.0.0
+    ListenAddress ::
+    # 允许root登录
+    PermitRootLogin yes
+    # 允许密码登录
+    PasswordAuthentication yes
+    ```
+3. 在win10中以管理员模式打开powershell，输入以下指令
+    ```bash
+    # listenport     win10监听的端口号
+    # listenaddress  win10监听的外网地址，0.0.0.0指所有地址
+    # connectport    映射的linux的端口，也就是上述配置文件中的端口
+    # connectaddress linux的ip，此处因为我已经修改了host，所以直接写host中的地址即可
+    # 可以理解为，所有主机发往win10:2222端口的tcp信息都会转发到debian.wsl:2211
+    netsh interface portproxy set v4tov4 listenport=2222 listenaddress=0.0.0.0 connectport=2211 connectaddress=debian.wsl
+    ```
+4. 配置win10防火墙
+   1. 打开WIN10防火墙
+   2. 选择高级设置
+   3. 点击左侧入站规则
+   4. 点击右侧新建规则
+   5. 规则类型选择端口
+   6. 协议和端口，在本地特定端口配置刚刚填写的2222
+   7. 其他默认下一步即可
+5. 查看win10的ip(使用ipconfig命令)
+6. 使用其他电脑，直接执行ssh命令即可
+    ```bash
+    # ip是win10的ip
+    # 端口是win10配置的端口
+    # 用户是linux的用户
+    ssh root@192.168.3.1 -p 2222
+    ```
+   
+
+## WLS2使用Windows的软件上网
 1. 检查WSL2能不能PING通Windows主机
    ```bash
    cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*'
@@ -158,14 +249,14 @@ wsl --set-default-version 2
    New-NetFirewallRule -DisplayName "WSL" -Direction Inbound  -InterfaceAlias "vEthernet (WSL)"  -Action Allow
    ```
    输入后，就可以ping通了
-3. 打开Windows的代理，勾选如(允许来自局域网的连接)或(ALLOW LAN)之类的选项，并确认代理的端口(如我的是7890)
+3. 打开Windows的软件，勾选如(允许来自局域网的连接)或(ALLOW LAN)之类的选项，并确认软件的端口(如我的是7890)
 4. 在WSL2下输入以下指令
    ```bash
    export hostip=$(cat /etc/resolv.conf |grep -oP '(?<=nameserver\ ).*')
    export https_proxy="http://${hostip}:7890"
    export http_proxy="http://${hostip}:7890"
    ```
-5. 如果不需要代理了，执行如下指令删除配置即可
+5. 如果不需要软件了，执行如下指令删除配置即可
    ```bash
    export -n https_proxy
    export -n http_proxy
