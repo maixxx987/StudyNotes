@@ -238,7 +238,7 @@ redis-cli
 public class LuaDemo {
     public static void main(String[] args) {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://myServer:3306");
+        config.useSingleServer().setAddress("redis://myServer:6379");
         RedissonClient redissonClient = Redisson.create(config);
         // Lua
         // 布隆过滤器命名为 filter1 (如不存在则会默认创建), 并写入参数TOM
@@ -266,7 +266,7 @@ Redisson已经封装好了相关的操作逻辑，且使用原版的Redis即可�
 public class RedissonAPIDemo {
     public static void main(String[] args) {
         Config config = new Config();
-        config.useSingleServer().setAddress("redis://myServer:3306");
+        config.useSingleServer().setAddress("redis://myServer:6379");
         RedissonClient redissonClient = Redisson.create(config);
         RBloomFilter<String> bloomFilter = redissonClient.getBloomFilter("filter2");
         // 初始化布隆过滤器，预计统计元素数量为10000，期望误差率为0.01
