@@ -302,7 +302,7 @@ public class RedissonAPIDemo {
 
 请求进来前，先经过布隆过滤器，若布隆过滤器中不存在该元素，可以直接拒绝该请求。若请求通过，则按原先流程，先查缓存，在查数据库。
 
-![布隆过滤器添加数据.png](https://github.com/maixxx987/StudyNotes/blob/master/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/image/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%BB%E5%8A%A0%E6%95%B0%E6%8D%AE.png)
+![布隆过滤器添加数据.png](https://github.com/maixxx987/StudyNotes/blob/master/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/image/%E7%BC%93%E5%AD%98%E6%B5%81%E7%A8%8B.png)
 
 
 ### 2. 去重
@@ -315,7 +315,7 @@ public class RedissonAPIDemo {
 2. 判断需要出里的元素是否在布隆过滤器中，存在则不处理，不存在则处理。
 3. 将任务添加进布隆过滤器中。
 
-![布隆过滤器添加数据.png](https://github.com/maixxx987/StudyNotes/blob/master/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/image/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8%E6%B7%BB%E5%8A%A0%E6%95%B0%E6%8D%AE.png)
+![布隆过滤器添加数据.png](https://github.com/maixxx987/StudyNotes/blob/master/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/image/%E5%8E%BB%E9%87%8D%E6%B5%81%E7%A8%8B.png)
 
 
 ## 在使用布隆过滤器中需要考虑的问题
