@@ -25,10 +25,17 @@ public class RedissonAPIDemo {
         bloomFilter.add("JACK");
         // 判断数据
         // true
-        System.out.println(bloomFilter.contains("TOM"));
+        System.out.println("TOM是否存在: " + bloomFilter.contains("TOM"));
         // ture
-        System.out.println(bloomFilter.contains("JACK"));
+        System.out.println("JACK是否存在: " + bloomFilter.contains("JACK"));
         // false
-        System.out.println(bloomFilter.contains("Black"));
+        System.out.println("Black是否存在: " + bloomFilter.contains("Black"));
+        System.out.println("预期插入数量: " +  bloomFilter.getExpectedInsertions());
+        System.out.println("容错率: " + bloomFilter.getFalseProbability());
+        System.out.println("hash函数的个数: " + bloomFilter.getHashIterations());
+        System.out.println("插入对象的个数: " + bloomFilter.count());
+
+        redissonClient.getAtomicLong("key").addAndGet(1L);
+
     }
 }

@@ -1,0 +1,4 @@
+spring:
+  redis:
+    host: myserver
+    port: 3306
