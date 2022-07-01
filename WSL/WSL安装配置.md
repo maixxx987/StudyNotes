@@ -2,14 +2,6 @@
 
 安装过程可以参考 [微软官方文档](https://docs.microsoft.com/zh-cn/windows/wsl/install) ，此处暂时省略。
 
-- [WSL 安装配置](#wsl-安装配置)
-  - [配置root账户](#配置root账户)
-  - [配置root账户命令行颜色](#配置root账户命令行颜色)
-  - [配置默认登陆账号为root](#配置默认登陆账号为root)
-  - [配置默认WSL](#配置默认wsl)
-  - [切换软件源(此处以Debian为例)](#切换软件源此处以debian为例)
-  - [安装Docker](#安装docker)
-
 ## 配置root账户
 WSL安装好后，默认是进入普通账户，需要配置root账户后才能进如root账户
 
@@ -99,7 +91,7 @@ wslconfig /setdefault Debian
    sudo apt update
    # 升级软件包
    sudo apt upgrade
-    ```
+   ```
    
 ## 配置ll指令
 Debian默认是不支持ll的，ll其实就是ls -l，只需要修改.bashrc文件即可
@@ -232,7 +224,7 @@ debian.wsl  myServer.wsl wsl.loacl
     # 用户是linux的用户
     ssh root@192.168.3.1 -p 2222
     ```
-   
+
 
 ## WLS2使用Windows的软件上网
 1. 检查WSL2能不能PING通Windows主机
@@ -261,3 +253,17 @@ debian.wsl  myServer.wsl wsl.loacl
    export -n https_proxy
    export -n http_proxy
    ```
+
+
+
+## 映射本地磁盘
+
+打开我的电脑，上方菜单选择映射驱动器
+
+在弹出框中，输入
+
+```
+\\wsl$
+```
+
+然后点击浏览，选择需要的WSL主机，完成即可
