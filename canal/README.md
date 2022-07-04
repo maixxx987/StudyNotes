@@ -246,7 +246,7 @@
 - TODO 测试数据
 
 
-  
+
 
 - 测试代码[官方ClientExample]([ClientExample · alibaba/canal Wiki (github.com)](https://github.com/alibaba/canal/wiki/ClientExample))
 
@@ -893,6 +893,35 @@ public class CanalUtil {
 1. 修改配置文件，链接Canal服务
 2. 实现ICanalHandler，编写同步课表的具体逻辑
 
+
+
+## 遇到的问题及解决方案
+
+### canal消费binlog异常(CanalMetaManagerException: batchId:3 is not the firstly:1)
+
+- 问题日志
+
+  ```log
+  com.alibaba.otter.canal.protocol.exception.CanalClientException: something goes wrong with reason: something goes wrong with channel:[id: 0x184cf2a7, /172.31.23.66:49436 => /172.31.23.66:11111], exception=com.alibaba.otter.canal.meta.exception.CanalMetaManagerException: batchId:355 is not the firstly:250
+  
+          at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.receiveMessages(SimpleCanalConnector.java:245)
+          at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.getWithoutAck(SimpleCanalConnector.java:222)
+          at com.alibaba.otter.canal.client.impl.SimpleCanalConnector.getWithoutAck(SimpleCanalConnector.java:207)
+  ```
+
+- 问题原因
+
+  Canal读取MySQL的时候会记录读取的位置，保存在meta.dat文件中，canal程序长时间停止后又重启，最后一次记录的位置已经在MySQL的bin-log日志中丢失，导致读取不到数据。
+
+- 解决方法
+
+  删除服务端对应实例的meta.dat文件
+
+  ```bash
+  rm -rf conf/example/met
+  ```
+
+  
 
 
 
