@@ -386,6 +386,14 @@
 
 
 
+### 具体实现步骤
+
+1. 部署canal，并修改配置文件
+2. 项目中CanalPlugin，并在JFinal中装配
+3. 实现ICanalHandler，编写同步课表的具体逻辑
+
+
+
 ### JFinal插件相关说明
 
 #### 插件核心代码 CanalPlugin.java 
@@ -778,7 +786,31 @@ public interface ICanalHandler {
 
 
 
-#### 配置文件 canal.properties
+#### Canal server的配置文件
+
+- canal 服务配置文件(conf/canal.properties)
+
+  ```properties
+  # 可以配置下端口，用户名密码
+  canal.port = 11113
+  canal.user = canal
+  canal.passwd = 123456
+  
+  # 配置对应的canal实例
+  canal.destinations = test1
+
+- canal 实例配置文件 (conf/test1/instance.properties)
+
+  ```properties
+  # 只需要修改数据库配置即可，具体监听表在Java配置文件中配置
+  canal.instance.master.address=127.0.0.1:3307
+  ```
+
+  
+
+
+
+#### JFinal的canal配置文件 canal.properties
 
 ```properties
 # ======= canal服务配置 =======
@@ -829,7 +861,6 @@ import java.util.Map;
 /**
  * canal工具类
  *
- * @author AVA
  */
 public class CanalUtil {
 
@@ -884,17 +915,6 @@ public class CanalUtil {
 
 
 
-### 具体实现步骤
-
-此处省略部署Canal步骤，和上面配置Canal相同
-
-此处默认已经有了基于JFinal的Canal Plugin
-
-1. 修改配置文件，链接Canal服务
-2. 实现ICanalHandler，编写同步课表的具体逻辑
-
-
-
 ## 遇到的问题及解决方案
 
 ### canal消费binlog异常(CanalMetaManagerException: batchId:3 is not the firstly:1)
@@ -918,7 +938,7 @@ public class CanalUtil {
   删除服务端对应实例的meta.dat文件
 
   ```bash
-  rm -rf conf/example/met
+  rm -rf conf/example/meta.dat
   ```
 
   
