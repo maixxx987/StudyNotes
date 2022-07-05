@@ -828,10 +828,10 @@ canal.destination=test1,test2
 
 # ======= canal实例配置 =======
 # canal处理逻辑类路径，必填，一个实例对应一个类
-canal.test1.class=com.ava.thirdparty.canal.impl.LiveCanalHandler
+canal.test1.class=CanalHandler
 # 监听的表，若配置了这个，则服务端的监听配置失效，多个用逗号分隔
 # 与服务器一样，采用正则配置
-canal.test1.filter=test.V_PUB_SCHEDULE
+canal.test1.filter=test.schedule
 # canal单次消费数量
 canal.test1.batchSize=1000
 # canal消费间隔
@@ -839,10 +839,10 @@ canal.test1.interval=2000
 
 
 # canal处理逻辑类路径，必填，一个实例对应一个类
-canal.test2.class=com.ava.thirdparty.canal.impl.LiveCanalHandler2
+canal.test2.class=CanalHandler2
 # 监听的表，若配置了这个，则服务端的监听配置失效，多个用逗号分隔
 # 与服务器一样，采用正则配置
-canal.test2.filter=test.V_PUB_SCHEDULE_2
+canal.test2.filter=test.schedule
 # canal单次消费数量
 canal.test2.batchSize=1000
 # canal消费间隔
