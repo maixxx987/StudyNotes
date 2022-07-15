@@ -14,14 +14,19 @@
 >
 > 以上内容在JDK14正式加入
 
+
+
+### quick start
+
 先来看一个老版本的例子
+
 ```java
-    /**
- * old version switch
+/**
+ * 老版本 switch
  *
  * @param i param
  */
-private static void oldSwitch(Integer i) {
+static void oldSwitch(Integer i) {
     switch (i) {
         case 1:
         case 2:
@@ -38,14 +43,20 @@ private static void oldSwitch(Integer i) {
 }
 ```
 
-用JDK12的语法来写将会是一下这样
+
+
+相比老版本，新版本的switch有以下特点
+
+- 不需要break，默认带break
+- 可以使用lambda表达式
+
 ```java
 /**
  * 新版本switch
  *
  * @param i param
  */
-private static void newSwitch(Integer i) {
+static void newSwitch(Integer i) {
     switch (i) {
         case 1, 2, 3 -> System.out.println("less than three");
         case 4       -> System.out.println("four");
@@ -54,10 +65,12 @@ private static void newSwitch(Integer i) {
 }
 ```
 
-两者对比可以看到，节省了break，也使得代码更精简。
 
 
-同时，新版本的switch也可以直接赋值
+### 赋值
+
+新版本的switch也可以直接赋值
+
 ```java
 /**
  * 使用switch赋值
@@ -68,7 +81,7 @@ private static void newSwitch(Integer i) {
  * @param i param
  * @return result
  */
-private static String assign(Integer i) {
+static String assign(Integer i) {
     return switch (i) {
         case 1, 2, 3 -> "A";
         case 4, 5, 6 -> "B";
@@ -81,14 +94,19 @@ private static String assign(Integer i) {
 }
 ```
 
-同时，在JDK17中优化了模式匹配运算符
+
+
+### 模式匹配
+
+在JDK17中优化了模式匹配运算符
+
 ```java
-    /**
+/**
  * instanceof 优化
  *
  * @param obj param
  */
-private static void instanceofFun(Object obj) {
+static void instanceofFun(Object obj) {
     // 老版本
     if (obj instanceof String) {
         String str = (String) obj;
@@ -102,7 +120,12 @@ private static void instanceofFun(Object obj) {
 }
 ```
 
+
+
 模式匹配搭配switch使用
+
+- 允许匹配null
+
 ```java
 /**
  * 模式匹配
@@ -110,16 +133,77 @@ private static void instanceofFun(Object obj) {
  * @param o param
  * @return String
  */
-private static String formatterPatternSwitch(Object o) {
+enum Color {RED, GREEN, BLUE}
+
+/**
+ * 模式匹配，除了基础类外，还可以匹配null，自定义类
+ * 父类必须写在子类下面(CharSequence是String的父类，若写在String上面则会报错)
+ *
+ * @param o param
+ * @return String
+ */
+static String formatterPatternSwitch(Object o) {
     return switch (o) {
-        case Integer i -> String.format("int %d", i);
-        case Long l    -> String.format("long %d", l);
-        case Double d  -> String.format("double %f", d);
-        case String s  -> String.format("String %s", s);
-        default        -> o.toString();
+        case null            -> "null";
+        case Color c         -> String.format("color %s", c.name());
+        case Integer i       -> String.format("int %d", i);
+        case Long l          -> String.format("long %d", l);
+        case Double d        -> String.format("double %f", d);
+        case String s        -> String.format("String %s", s);
+        // charSequence是string的父类，因此必须写在String下面
+        case CharSequence cs -> String.format("String %s", cs);
+        case int[] array     -> Arrays.toString(array);
+        default              -> o.toString();
     };
 }
 ```
+
+
+
+### 混合条件
+
+default也可以和其他条件一起使用
+
+```java
+/**
+ * default可以和其他条件一起使用
+ * 但此时不能有入参(因为default没入参)
+ */
+static void multiCondition(Object o) {
+    switch (o) {
+        case null, default -> System.out.println("null");
+    }
+}
+```
+
+
+
+### 保护模式
+
+对某种类型判断的时候可以细化
+
+```java
+/**
+ * 对类型判断的时候可以细化
+ */
+static void boolCondition(Object o) {
+    switch (o) {
+        case null                       -> System.out.println("null");
+        case Integer i && (i > 100)     -> System.out.println("big number");
+        case Integer i && (i > 50)      -> System.out.println("mid number");
+        case String s && (!s.isBlank()) -> System.out.printf("not blank string -> %s%n", s);
+        default -> throw new IllegalStateException("Unexpected value: " + o.toString());
+    }
+}
+```
+
+
+
+### 参考资料
+
+- [JDK 17 switch模式匹配 - 掘金 (juejin.cn)](https://juejin.cn/post/7031160512553435173)
+
+
 
 ## Lambda & Function
 
