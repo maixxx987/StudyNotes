@@ -151,34 +151,12 @@ static String formatterPatternSwitch(Object o) {
         case Double d        -> String.format("double %f", d);
         case String s        -> String.format("String %s", s);
         // charSequence是string的父类，因此必须写在String下面
-        case CharSequence cs -> String.format("String %s", cs);
+        case CharSequence cs -> String.format("CharSequence %s", cs);
         case int[] array     -> Arrays.toString(array);
         default              -> o.toString();
     };
 }
 ```
-
-
-
-### 混合条件
-
-default也可以和其他条件一起使用
-
-```java
-/**
- * default可以和其他条件一起使用
- * 但此时不能有入参(因为default没入参)
- */
-static void multiCondition(Object o) {
-    switch (o) {
-        case null, default -> System.out.println("null");
-    }
-}
-```
-
-
-
-### 保护模式
 
 对某种类型判断的时候可以细化
 
@@ -198,6 +176,23 @@ static void boolCondition(Object o) {
 ```
 
 
+### 混合条件
+
+default也可以和其他条件一起使用
+
+```java
+/**
+ * default可以和其他条件一起使用
+ * 但此时不能有入参(因为default没入参)
+ */
+static void multiCondition(Object o) {
+    switch (o) {
+        case null, default -> System.out.println("null");
+        case Integer i     -> String.format("int %d", i);
+        case Long l        -> String.format("long %d", l);
+    }
+}
+```
 
 ### 参考资料
 
@@ -207,7 +202,107 @@ static void boolCondition(Object o) {
 
 ## Lambda & Function
 
+
+
 ### Optional
-> JDK8中加入了Option，专门用于判断非空处理，但只能处理if，不能处理else
+
+> JDK8中加入了Optional，专门用于解决NPE问题。
 > 
-> JDK9中加入了ifPresentOrElse，用于处理else
+> JDK9中则对Optional进行了增强，新增了 ifPresentOrElse()、or() 和 stream() 等方法。
+
+
+
+#### 解决NPE
+
+假设有一个Student类，里面有属性Teacher，我们需要获取Teacher内的age
+
+```java
+// 这里采用了lombok
+@Data
+class Teacher {
+    private Integer age;
+}
+
+@Data
+class Student {
+    private Teacher teacher;
+}
+```
+
+传统解决NPE方法如下
+```java
+/**
+ * 传统方法，解决NPE
+ *
+ * @param student param
+ */
+static void old(Student student) {
+    if (Objects.nonNull(student)) {
+        Teacher teacher = student.getTeacher();
+        if (Objects.nonNull(teacher)) {
+            System.out.println("teacher age = " + teacher.getAge());
+        }
+    }
+}
+```
+
+采用Optional获取
+```java
+/**
+ * JDK8的Optional
+ *
+ * @param student param
+ */
+static void jdk8Optional(Student student) {
+    Optional.ofNullable(student)
+        .map(Student::getTeacher)
+        .ifPresent(System.out::println);
+}
+```
+
+可以看到，Optional可以很方便的解决NPE问题。
+
+
+
+但是，在JDK8时，无法解决Else问题，比如如果上面如果获取不到，我需要输出null，这时候就需要JDK9的ifPresentOrElse()方法
+
+> ifPresentOrElse() 方法接受两个参数 Consumer 和 Runnable ，如果 Optional 不为空调用 Consumer 参数，为空则调用 Runnable 参数。
+
+```java
+/**
+ * JDK9的Optional
+ *
+ * @param student param
+ */
+static void jdk9Optional(Student student) {
+    Optional.ofNullable(student)
+        .map(Student::getTeacher)
+        .ifPresentOrElse(System.out::println, () -> System.out.println("teacher is null"));
+}
+```
+
+
+
+测试结果
+
+```java
+Student student = new Student();
+// 没有教师
+old(student);           // 无输出
+jdk8Optional(student);  // 无输出
+jdk9Optional(student);  // teacher is null
+
+// 有教师
+Teacher teacher = new Teacher();
+student.setTeacher(teacher);
+old(student);           // Teacher(age=null)
+jdk8Optional(student);  // Teacher(age=null)
+jdk9Optional(student);  // Teacher(age=null)
+
+// 有教师年龄
+teacher.setAge(35);
+old(student);           // Teacher(age=35)
+jdk8Optional(student);  // Teacher(age=35)
+jdk9Optional(student);  // Teacher(age=35)
+```
+

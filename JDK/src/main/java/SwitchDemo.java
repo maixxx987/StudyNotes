@@ -104,7 +104,7 @@ public class SwitchDemo {
             case Double d        -> String.format("double %f", d);
             case String s        -> String.format("String %s", s);
             // charSequence是string的父类，因此必须写在String下面
-            case CharSequence cs -> String.format("String %s", cs);
+            case CharSequence cs -> String.format("CharSequence %s", cs);
             case int[] array     -> Arrays.toString(array);
             default              -> o.toString();
         };
@@ -117,6 +117,8 @@ public class SwitchDemo {
     static void multiCondition(Object o) {
         switch (o) {
             case null, default -> System.out.println("null");
+            case Integer i     -> String.format("int %d", i);
+            case Long l        -> String.format("long %d", l);
         }
     }
 
