@@ -306,3 +306,16 @@ jdk8Optional(student);  // Teacher(age=35)
 jdk9Optional(student);  // Teacher(age=35)
 ```
 
+
+
+#### 其他
+
+不要为了使用Optional而使用Optional，有时候可以用三目表达式解决问题
+
+```java
+// 这种情况下可以直接用三目表达式，少创建了一个Optional对象，且更清晰
+Student student = Optional.ofNullable(student1).orElse(defaultStudent);
+
+Student student = Objects.isNull(student1) ? student1 : defaultStudent;
+```
+
