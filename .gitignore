@@ -238,3 +238,5 @@ cython_debug/
 
 .idea/
 *.iml
+
+.gitignore

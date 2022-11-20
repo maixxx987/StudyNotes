@@ -1,0 +1,26 @@
+spring:
+  # H2数据库配置
+  datasource:
+    url: jdbc:h2:./data/test;AUTO_RECONNECT=TRUE;
+    username: sa
+    password: 123456
+    driver-class-name: org.h2.Driver
+
+  # H2网页控制台配置
+  h2:
+    console:
+      # 是否开启网页控制台
+      enabled: true
+      # 网页控制台路径 如 localhost/h2-console
+      path: /h2-console
+      settings:
+        # 是否允许其他客户端远程访问(包括本机的数据库客户端)
+        web-allow-others: true
+  sql:
+    init:
+      # 每次启动程序，程序都会运行resources/db/schema.sql文件，对数据库的结构进行操作。
+      schema-locations: classpath:db/schema.sql
+      # 每次启动程序，程序都会运行resources/db/data.sql文件，对数据库的数据操作。
+#      data-locations: classpath:db/data.sql
+      # 是否每次都执行初始化文件
+      mode: always
