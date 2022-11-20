@@ -26,7 +26,7 @@ public class StudentDao {
         try {
             student = jdbcTemplate.queryForObject("SELECT * FROM student WHERE id = :id ", Map.of("id", id), BeanPropertyRowMapper.newInstance(Student.class));
         } catch (EmptyResultDataAccessException e) {
-            System.err.println(String.format("[StudentDao#findById]data not found, id = %d", id));
+            System.err.printf("[StudentDao#findById]data not found, id = %d%n", id);
         }
         return student;
     }
