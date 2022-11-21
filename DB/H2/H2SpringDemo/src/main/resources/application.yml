@@ -1,6 +1,7 @@
 spring:
   # H2数据库配置
   datasource:
+    # 如果是多数据源或自定义数据源时, 此处用jdbc-url, 否则默认的hikari连接池会报错
     url: jdbc:h2:./data/test;AUTO_RECONNECT=TRUE;
     username: sa
     password: 123456
